@@ -113,6 +113,22 @@ class _AuthCardState extends State<AuthCard> {
   var _isLoading = false;
   final _passwordController = TextEditingController();
 
+  void _showError(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('An Error Occured'),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Okay'),
+            onPressed: () => Navigator.of(ctx).pop(),
+          )
+        ],
+      ),
+    );
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState.validate()) {
       // Invalid!
@@ -122,15 +138,35 @@ class _AuthCardState extends State<AuthCard> {
     setState(() {
       _isLoading = true;
     });
-    if (_authMode == AuthMode.Login) {
-      // Log user in
-      await Provider.of<Auth>(context, listen: false)
-          .login(_authData['email'], _authData['password']);
-    } else {
-      // Sign user up
-      await Provider.of<Auth>(context, listen: false)
-          .signup(_authData['email'], _authData['password']);
+    try {
+      if (_authMode == AuthMode.Login) {
+        // Log user in
+        await Provider.of<Auth>(context, listen: false)
+            .login(_authData['email'], _authData['password']);
+      } else {
+        // Sign user up
+        await Provider.of<Auth>(context, listen: false)
+            .signup(_authData['email'], _authData['password']);
+      }
+    } catch (e) {
+      String errorMessage =
+          'could not authenticate... try again after some time';
+      if (e.toString().contains('EMAIL_EXISTS')) {
+        errorMessage = "This Email address is already in use";
+      } else if (e.toString().contains('INVALID_EMALID')) {
+        errorMessage = "This is not a valid email address";
+      } else if (e.toString().contains('WEAK_PASSWORD')) {
+        errorMessage = 'This password is too weak';
+      } else if (e.message.contains('EMAIL_NOT_FOUND')) {
+        errorMessage = 'Email not found';
+      } else if (e.toString().contains('INVALID_PASSWORD')) {
+        errorMessage = 'Invalid Password';
+      } else {
+        return;
+      }
+      _showError(errorMessage);
     }
+
     setState(() {
       _isLoading = false;
     });
