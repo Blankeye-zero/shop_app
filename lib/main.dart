@@ -21,37 +21,48 @@ class MyApp extends StatelessWidget {
       value: Products(), an alternative to passing context  using create argument*/
         MultiProvider(
       providers: [
-        ChangeNotifierProvider  (create: (ctx) => Auth()),
         ChangeNotifierProvider(
-          create: (ctx) => Products(),
+          create: (ctx) => Auth(),
+        ),
+        /* ChangeNotifierProxyProvider is actually a generic class thus we need to specify the intended type through angular brackets, it basically creats a link to access a dependency that is 
+        to be mentioned above the current provider, and passes it to the current provider. We can pass on the token this way*/
+        /* If we have more than a single dependency, then correspondingly ChangeProxyProvider2, ChangeProxyProvider3 classes are available*/
+        ChangeNotifierProxyProvider<Auth, Products>(
+          create: (ctx) => Products("", []),
+          update: (ctx, auth, previousState) => Products(
+              auth.token, previousState == null ? [] : previousState.items),
         ),
         ChangeNotifierProvider(
           create: (ctx) => Cart(),
         ),
-        ChangeNotifierProvider(
-          create: (ctx) => Orders(),
+        ChangeNotifierProxyProvider<Auth, Orders>(
+          create: (ctx) => Orders("", []),
+          update: (ctx, auth, previousState) => Orders(
+              auth.token, previousState == null ? [] : previousState.orders),
         ),
       ],
       //the .value constructor can be used as an alternative if there is no context involved.
       //also this is the right approach when we use a listener as a part of a list or a grid since the UI is dynamically rendered using builder methods.
       // The MultiProvider Method is used to link up multiple providers to a widget.
-      child: MaterialApp(
-        title: 'MyShop',
-        theme: ThemeData(
-          primarySwatch: Colors.blueGrey,
-          accentColor: Colors.brown,
-          fontFamily: 'Lato',
+      child: Consumer<Auth>(
+        builder: (context, auth, _) => MaterialApp(
+          title: 'MyShop',
+          theme: ThemeData(
+            primarySwatch: Colors.blueGrey,
+            accentColor: Colors.brown,
+            fontFamily: 'Lato',
+          ),
+          home: auth.isAuth ? ProductOverviewPage() : AuthScreen(),
+          debugShowCheckedModeBanner: false,
+          routes: {
+            ProductOverviewPage.routeName: (ctx) => ProductOverviewPage(),
+            ProductDetailPage.routeName: (ctx) => ProductDetailPage(),
+            CartScreen.routeName: (ctx) => CartScreen(),
+            OrdersPage.routeName: (ctx) => OrdersPage(),
+            UserProductsScreen.routeName: (ctx) => UserProductsScreen(),
+            EditProductScreen.routeName: (ctx) => EditProductScreen(),
+          },
         ),
-        home: AuthScreen(),
-        debugShowCheckedModeBanner: false,
-        routes: {
-          ProductOverviewPage.routeName: (ctx) => ProductOverviewPage(),
-          ProductDetailPage.routeName: (ctx) => ProductDetailPage(),
-          CartScreen.routeName: (ctx) => CartScreen(),
-          OrdersPage.routeName: (ctx) => OrdersPage(),
-          UserProductsScreen.routeName: (ctx) => UserProductsScreen(),
-          EditProductScreen.routeName: (ctx) => EditProductScreen(),
-        },
       ),
     );
   }

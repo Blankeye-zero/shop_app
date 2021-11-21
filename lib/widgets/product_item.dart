@@ -3,6 +3,7 @@ import 'package:shop_app/provider/cart.dart';
 import '../pages/product_detail_page.dart';
 import '../provider/product.dart';
 import 'package:provider/provider.dart';
+import '../provider/auth.dart';
 
 class ProductItem extends StatelessWidget {
   // final String id;
@@ -18,6 +19,7 @@ class ProductItem extends StatelessWidget {
     final product =
         Provider.of<Product>(context, listen: false); //set the listen = false.
     final cart = Provider.of<Cart>(context, listen: false); //set listen = fasle
+    final authData = Provider.of<Auth>(context, listen: false).token;
     return GridTile(
         child: GestureDetector(
           onTap: () {
@@ -41,7 +43,7 @@ class ProductItem extends StatelessWidget {
                     ? Icons.favorite
                     : Icons.favorite_border),
                 onPressed: () {
-                  product.toggleFavoriteStatus();
+                  product.toggleFavoriteStatus(authData);
                 },
               ),
             ),

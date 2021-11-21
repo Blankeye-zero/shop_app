@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../provider/auth.dart';
+import '../models/httpException.dart';
 
 enum AuthMode { Signup, Login }
 
@@ -148,9 +149,8 @@ class _AuthCardState extends State<AuthCard> {
         await Provider.of<Auth>(context, listen: false)
             .signup(_authData['email'], _authData['password']);
       }
-    } catch (e) {
-      String errorMessage =
-          'could not authenticate... try again after some time';
+    } on HttpException catch (e) {
+      String errorMessage = 'Authentication Failed';
       if (e.toString().contains('EMAIL_EXISTS')) {
         errorMessage = "This Email address is already in use";
       } else if (e.toString().contains('INVALID_EMALID')) {
@@ -164,6 +164,10 @@ class _AuthCardState extends State<AuthCard> {
       } else {
         return;
       }
+      _showError(errorMessage);
+    } catch (e) {
+      String errorMessage =
+          'could not authenticate... try again after some time';
       _showError(errorMessage);
     }
 

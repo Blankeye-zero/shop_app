@@ -27,9 +27,9 @@ class Product with ChangeNotifier {
   }
 
 //employing optimistic updating...
-  Future<void> toggleFavoriteStatus() async {
+  Future<void> toggleFavoriteStatus(String token) async {
     A _obj = new A();
-    final url = _obj.giveId(id);
+    final url = '${_obj.giveId(id)}?auth=$token';
     final oldStatus = isFavorite;
     isFavorite = !isFavorite;
     notifyListeners(); //equivalent to setState() in stateful widgets.

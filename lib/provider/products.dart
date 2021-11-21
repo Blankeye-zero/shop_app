@@ -7,42 +7,10 @@ import 'package:http/http.dart' as http;
 import '../secrets/constants.dart';
 
 class Products with /*mixin?*/ ChangeNotifier {
+  final String token;
+  Products(this.token, this._items);
   A _obj = new A();
   List<Product> _items = [];
-  // List<Product> _items = [
-  // Product(
-  //   id: 'p1',
-  //   title: 'Red Shirt',
-  //   description: 'A red shirt - it is pretty red!',
-  //   price: 29.99,
-  //   imageUrl:
-  //       'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-  // ),
-  // Product(
-  //   id: 'p2',
-  //   title: 'Trousers',
-  //   description: 'A nice pair of trousers.',
-  //   price: 59.99,
-  //   imageUrl:
-  //       'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%3Fid%3DOIP.aD4QPKD_M6WvFohan6stsAHaKw%26pid%3DApi&f=1',
-  // ),
-  // Product(
-  //   id: 'p3',
-  //   title: 'Red Scarf',
-  //   description: 'Warm and cozy - exactly what you need for the winter.',
-  //   price: 19.99,
-  //   imageUrl:
-  //       'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%3Fid%3DOIP.lOPLnJU6qhAFhTilg47WdAHaJr%26pid%3DApi&f=1',
-  // ),
-  // Product(
-  //   id: 'p4',
-  //   title: 'Shoes',
-  //   description: 'Walk in style',
-  //   price: 49.99,
-  //   imageUrl:
-  //       'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse4.mm.bing.net%2Fth%3Fid%3DOIP.5Kcks9i4txw6-D8g72iGsQHaHa%26pid%3DApi&f=1',
-  // ),
-  // ];
 
 /* The filter using Provider.of method has been commented out as the products overview page has been made into a stateful widget.
 this property must never be directly accessible from the outside.
@@ -86,8 +54,9 @@ all objects in dart are reference types. if we used the _items list directly, th
   }
 
   Future<void> fetchProducts() async {
+    //In some apis, we need to encode the api key in the url header in order to authenticate
     try {
-      final getResponse = await http.get(_obj.productUrl);
+      final getResponse = await http.get('${_obj.productUrl}?auth=$token');
       final productExtract =
           json.decode(getResponse.body) as Map<String, dynamic>;
       if (productExtract == null) {
@@ -120,7 +89,7 @@ all objects in dart are reference types. if we used the _items list directly, th
 
     try {
       final value = await http.post(
-        _obj.productUrl,
+        '${_obj.productUrl}?auth=$token',
         body: json.encode({
           'title': product.title,
           'descripton': product.description,
@@ -185,26 +154,33 @@ all objects in dart are reference types. if we used the _items list directly, th
   Future<void> update(String id, Product newProduct) async {
     final index = _items.indexWhere((element) => element.id == id);
 
-    if (index >= 0) {
-      final url = _obj.giveId(id);
-      /*A patch request has to carry data
-      Make sure that the keys that we are using here matches that of the keys used in firebase
-      As the patch request will try to merge this data to an existing data through overwriting
-      If the data dosent exist, then it will add the data
-      */
-      await http.patch(
-        url,
-        body: json.encode(
-          {
-            'title': newProduct.title,
-            'description': newProduct.description,
-            'imageUrl': newProduct.imageUrl,
-            'price': newProduct.price,
-          },
-        ),
-      );
-      _items[index] = newProduct;
-      notifyListeners();
+    try {
+      if (index >= 0) {
+        final url = '${_obj.giveId(id)}?auth=$token';
+        /*A patch request has to carry data
+        Make sure that the keys that we are using here matches that of the keys used in firebase
+        As the patch request will try to merge this data to an existing data through overwriting
+        If the data dosent exist, then it will add the data
+        */
+        final response = await http.patch(
+          url,
+          body: json.encode(
+            {
+              'title': newProduct.title,
+              'description': newProduct.description,
+              'imageUrl': newProduct.imageUrl,
+              'price': newProduct.price,
+            },
+          ),
+        );
+        print(json.decode(response.body));
+        _items[index] = newProduct;
+        notifyListeners();
+      }
+    } on Exception catch (e) {
+      print(e);
+
+      return;
     }
 
     /*else {
@@ -218,7 +194,7 @@ all objects in dart are reference types. if we used the _items list directly, th
 //Optimisting updating is where we immediately update the state on the client and would roll it back only if we receive an error from the server side.
 
   Future<void> delete(String id) async {
-    final url = _obj.giveId(id);
+    final url = '${_obj.giveId(id)}?auth=$token';
     final index = _items.indexWhere((element) => element.id == id);
     var product = _items[index];
 

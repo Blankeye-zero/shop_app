@@ -131,11 +131,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
       //   Navigator.of(context).pop();
       // }
       /*We are commenting out the finally block since we are using await in all the three cases above */
-      setState(() {
-        _isLoading = false;
-      });
-      Navigator.of(context).pop();
     }
+    setState(() {
+      _isLoading = false;
+    });
+
+    Navigator.of(context).pop();
   }
   /*   we are forwarding the edited product to the Products class' add product method.
      The .then() method is possible because we have declared addProducts Method as a Future.
