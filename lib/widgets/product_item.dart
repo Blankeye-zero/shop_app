@@ -19,7 +19,7 @@ class ProductItem extends StatelessWidget {
     final product =
         Provider.of<Product>(context, listen: false); //set the listen = false.
     final cart = Provider.of<Cart>(context, listen: false); //set listen = fasle
-    final authData = Provider.of<Auth>(context, listen: false).token;
+    final authData = Provider.of<Auth>(context, listen: false);
     return GridTile(
         child: GestureDetector(
           onTap: () {
@@ -43,7 +43,7 @@ class ProductItem extends StatelessWidget {
                     ? Icons.favorite
                     : Icons.favorite_border),
                 onPressed: () {
-                  product.toggleFavoriteStatus(authData);
+                  product.toggleFavoriteStatus(authData.token, authData.userId);
                 },
               ),
             ),

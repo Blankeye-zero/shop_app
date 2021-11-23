@@ -27,6 +27,10 @@ class Auth with ChangeNotifier {
     return null;
   }
 
+  String get userId {
+    return _userId;
+  }
+
   //method used to sign the user up
 
   Future<void> _authenticate(
