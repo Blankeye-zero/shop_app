@@ -8,7 +8,9 @@ import '../secrets/constants.dart';
 
 class Products with /*mixin?*/ ChangeNotifier {
   final String token;
-  Products(this.token, this._items);
+  final String userId;
+
+  Products(this.token, this._items, this.userId);
   A _obj = new A();
   List<Product> _items = [];
 
@@ -62,6 +64,9 @@ all objects in dart are reference types. if we used the _items list directly, th
       if (productExtract == null) {
         return;
       }
+      final url = '${_obj.allFav(userId)}?auth=$token';
+      final favResponse = await http.get(url);
+      final favData = json.decode(favResponse.body);
       final List<Product> catalog = [];
       productExtract.forEach((key, value) {
         catalog.add(
@@ -71,7 +76,8 @@ all objects in dart are reference types. if we used the _items list directly, th
             description: value['description'],
             price: value['price'],
             imageUrl: value['imageUrl'],
-            isFavorite: value['isFavorite'],
+            isFavorite: favData == null ? false : favData['$key'] ?? false,
+            //if favData is null or if there is no entry for the id/key, then we set it to false.
           ),
         );
       });
@@ -92,10 +98,9 @@ all objects in dart are reference types. if we used the _items list directly, th
         '${_obj.productUrl}?auth=$token',
         body: json.encode({
           'title': product.title,
-          'descripton': product.description,
+          'description': product.description,
           'imageUrl': product.imageUrl,
           'price': product.price,
-          'isFavorite': product.isFavorite
         }),
       );
       final addproduct = Product(

@@ -28,9 +28,9 @@ class MyApp extends StatelessWidget {
         to be mentioned above the current provider, and passes it to the current provider. We can pass on the token this way*/
         /* If we have more than a single dependency, then correspondingly ChangeProxyProvider2, ChangeProxyProvider3 classes are available*/
         ChangeNotifierProxyProvider<Auth, Products>(
-          create: (ctx) => Products("", []),
-          update: (ctx, auth, previousState) => Products(
-              auth.token, previousState == null ? [] : previousState.items),
+          create: (ctx) => Products("", [], ""),
+          update: (ctx, auth, previousState) => Products(auth.token,
+              previousState == null ? [] : previousState.items, auth.userId),
         ),
         ChangeNotifierProvider(
           create: (ctx) => Cart(),
