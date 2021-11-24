@@ -52,7 +52,19 @@ class MyApp extends StatelessWidget {
             colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blueGrey)
                 .copyWith(secondary: Colors.brown),
           ),
-          home: auth.isAuth ? ProductOverviewPage() : AuthScreen(),
+          //to show the login page instead of authscreen if not logged in already, we use futureBuilder
+          home: auth.isAuth
+              ? ProductOverviewPage()
+              : FutureBuilder(
+                  future: auth.tryAutoLogin(),
+                  builder: (context, snapshot) {
+                    return snapshot.connectionState == ConnectionState.waiting
+                        ? Center(
+                            child: Text('Loading....'),
+                          )
+                        : AuthScreen();
+                  },
+                ),
           debugShowCheckedModeBanner: false,
           routes: {
             ProductOverviewPage.routeName: (ctx) => ProductOverviewPage(),
