@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../provider/auth.dart';
-import '../models/httpException.dart';
 
 enum AuthMode { Signup, Login }
 
@@ -72,8 +71,7 @@ class AuthScreen extends StatelessWidget {
                       child: Text(
                         'MyShop',
                         style: TextStyle(
-                          color:
-                              Theme.of(context).accentTextTheme.headline6.color,
+                          color: Theme.of(context).colorScheme.secondary,
                           fontSize: 50,
                           fontFamily: 'Anton',
                           fontWeight: FontWeight.normal,
@@ -149,7 +147,7 @@ class _AuthCardState extends State<AuthCard> {
         await Provider.of<Auth>(context, listen: false)
             .signup(_authData['email'], _authData['password']);
       }
-    } on HttpException catch (e) {
+    } on Exception catch (e) {
       String errorMessage = 'Authentication Failed';
       if (e.toString().contains('EMAIL_EXISTS')) {
         errorMessage = "This Email address is already in use";
@@ -157,17 +155,13 @@ class _AuthCardState extends State<AuthCard> {
         errorMessage = "This is not a valid email address";
       } else if (e.toString().contains('WEAK_PASSWORD')) {
         errorMessage = 'This password is too weak';
-      } else if (e.message.contains('EMAIL_NOT_FOUND')) {
+      } else if (e.toString().contains('EMAIL_NOT_FOUND')) {
         errorMessage = 'Email not found';
       } else if (e.toString().contains('INVALID_PASSWORD')) {
         errorMessage = 'Invalid Password';
       } else {
         return;
       }
-      _showError(errorMessage);
-    } catch (e) {
-      String errorMessage =
-          'could not authenticate... try again after some time';
       _showError(errorMessage);
     }
 

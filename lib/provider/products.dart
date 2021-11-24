@@ -8,7 +8,9 @@ import '../secrets/constants.dart';
 
 class Products with /*mixin?*/ ChangeNotifier {
   final String token;
-  Products(this.token, this._items);
+  final String userId;
+
+  Products(this.token, this._items, this.userId);
   A _obj = new A();
   List<Product> _items = [];
 
@@ -53,15 +55,34 @@ all objects in dart are reference types. if we used the _items list directly, th
     return _items.firstWhere((prod) => prod.id == id);
   }
 
-  Future<void> fetchProducts() async {
+  Future<void> fetchProducts([bool filterByUser = false]) async {
+//square brackets around a positional argument make it optional
+//if it is not provided, then the value is set to default which is false in this case and if else mentioned to be otherwise true...
+/*
+final url = Uri.https(
+  "PASE_URL",
+  "/products.json",
+  {
+  "auth": authToken,
+    "orderBy": json.encode("creatorId"),
+    "equalTo": json.encode(userId),
+  },
+); */
+    final filterString =
+        filterByUser ? "orderBy='creatorId'&equalTo='$userId'" : "";
     //In some apis, we need to encode the api key in the url header in order to authenticate
     try {
-      final getResponse = await http.get('${_obj.productUrl}?auth=$token');
+      //the &orderBy and equalTo are firebase specific relativity commands to be performed on firebase to filter data.
+      final getResponse =
+          await http.get('${_obj.productUrl}?auth=$token&$filterString');
       final productExtract =
           json.decode(getResponse.body) as Map<String, dynamic>;
       if (productExtract == null) {
         return;
       }
+      final url = '${_obj.allFav(userId)}?auth=$token';
+      final favResponse = await http.get(url);
+      final favData = json.decode(favResponse.body);
       final List<Product> catalog = [];
       productExtract.forEach((key, value) {
         catalog.add(
@@ -71,7 +92,8 @@ all objects in dart are reference types. if we used the _items list directly, th
             description: value['description'],
             price: value['price'],
             imageUrl: value['imageUrl'],
-            isFavorite: value['isFavorite'],
+            isFavorite: favData == null ? false : favData['$key'] ?? false,
+            //if favData is null or if there is no entry for the id/key, then we set it to false.
           ),
         );
       });
@@ -92,10 +114,10 @@ all objects in dart are reference types. if we used the _items list directly, th
         '${_obj.productUrl}?auth=$token',
         body: json.encode({
           'title': product.title,
-          'descripton': product.description,
+          'description': product.description,
           'imageUrl': product.imageUrl,
           'price': product.price,
-          'isFavorite': product.isFavorite
+          'creatorId': userId,
         }),
       );
       final addproduct = Product(
