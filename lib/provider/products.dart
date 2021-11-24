@@ -55,10 +55,26 @@ all objects in dart are reference types. if we used the _items list directly, th
     return _items.firstWhere((prod) => prod.id == id);
   }
 
-  Future<void> fetchProducts() async {
+  Future<void> fetchProducts([bool filterByUser = false]) async {
+//square brackets around a positional argument make it optional
+//if it is not provided, then the value is set to default which is false in this case and if else mentioned to be otherwise true...
+/*
+final url = Uri.https(
+  "PASE_URL",
+  "/products.json",
+  {
+  "auth": authToken,
+    "orderBy": json.encode("creatorId"),
+    "equalTo": json.encode(userId),
+  },
+); */
+    final filterString =
+        filterByUser ? "orderBy='creatorId'&equalTo='$userId'" : "";
     //In some apis, we need to encode the api key in the url header in order to authenticate
     try {
-      final getResponse = await http.get('${_obj.productUrl}?auth=$token');
+      //the &orderBy and equalTo are firebase specific relativity commands to be performed on firebase to filter data.
+      final getResponse =
+          await http.get('${_obj.productUrl}?auth=$token&$filterString');
       final productExtract =
           json.decode(getResponse.body) as Map<String, dynamic>;
       if (productExtract == null) {
@@ -101,6 +117,7 @@ all objects in dart are reference types. if we used the _items list directly, th
           'description': product.description,
           'imageUrl': product.imageUrl,
           'price': product.price,
+          'creatorId': userId,
         }),
       );
       final addproduct = Product(
