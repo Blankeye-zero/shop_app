@@ -102,7 +102,10 @@ class AuthCard extends StatefulWidget {
   _AuthCardState createState() => _AuthCardState();
 }
 
-class _AuthCardState extends State<AuthCard> {
+class _AuthCardState extends State<AuthCard>
+    with SingleTickerProviderStateMixin {
+  //SingleTickerProviderStateMixin provided by material.dart brings to the table an array of functions that are used by the AnimationController and the vsync param.
+  //It also lets a widget know when a frame update is due - animations need that information to play smoothly
   final GlobalKey<FormState> _formKey = GlobalKey();
   AuthMode _authMode = AuthMode.Login;
   Map<String, String> _authData = {
@@ -111,6 +114,36 @@ class _AuthCardState extends State<AuthCard> {
   };
   var _isLoading = false;
   final _passwordController = TextEditingController();
+  //we need a timer iterable that fires every 60 ms to change to container height gradually...
+  //but flutter already has an animation controller class so dont need to reinvent the wheel.
+  //var containerHeight = 260;
+  AnimationController _animator; // A class provided by flutter
+  Animation<Size>
+      _heightAnimator; // An animation object - an entity that we are going to animate - in this case the Size.
+
+  @override
+  void initState() {
+    //Both the _animator and _heightAnimator must be initialized once a state object is created.
+    super.initState();
+    //Animation COntroller gets a vsync param where we give it a pointer to a widget where it only plays the animation once the widget is rendered.
+    _animator =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
+    _heightAnimator = Tween<Size>(
+            begin: Size(double.infinity, 260), end: Size(double.infinity, 320))
+        .animate(
+            CurvedAnimation(parent: _animator, curve: Curves.fastOutSlowIn));
+    _heightAnimator.addListener(() =>
+        setState(() {})); //rerunning the build method to redraw the screen.
+    //experiment with different animations of Curves.*
+    //Tween class is generic and we have to mention the type of what we are going to animate between two values..
+    //Tween itself wont animate values, it just returns them.. We have to call .animate.
+  }
+
+  @override
+  void dispose() {
+    _animator.dispose();
+    super.dispose();
+  }
 
   void _showError(String message) {
     showDialog(
@@ -175,10 +208,12 @@ class _AuthCardState extends State<AuthCard> {
       setState(() {
         _authMode = AuthMode.Signup;
       });
+      _animator.forward(); //controller.forward() starts the animation
     } else {
       setState(() {
         _authMode = AuthMode.Login;
       });
+      _animator.reverse(); //reversing the animation.
     }
   }
 
@@ -191,9 +226,9 @@ class _AuthCardState extends State<AuthCard> {
       ),
       elevation: 8.0,
       child: Container(
-        height: _authMode == AuthMode.Signup ? 320 : 260,
-        constraints:
-            BoxConstraints(minHeight: _authMode == AuthMode.Signup ? 320 : 260),
+        // height: _authMode == AuthMode.Signup ? 320 : 260,
+        height: _heightAnimator.value.height,
+        constraints: BoxConstraints(minHeight: _heightAnimator.value.height),
         width: deviceSize.width * 0.75,
         padding: EdgeInsets.all(16.0),
         child: Form(
