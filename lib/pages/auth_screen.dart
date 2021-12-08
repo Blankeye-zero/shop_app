@@ -141,8 +141,8 @@ class _AuthCardState extends State<AuthCard>
 
   @override
   void dispose() {
-    _animator.dispose();
     super.dispose();
+    _animator.dispose();
   }
 
   void _showError(String message) {
