@@ -132,9 +132,9 @@ class _AuthCardState extends State<AuthCard>
             begin: Size(double.infinity, 260), end: Size(double.infinity, 320))
         .animate(
             CurvedAnimation(parent: _animator, curve: Curves.fastOutSlowIn));
-    _heightAnimator.addListener(() =>
-        setState(() {})); //rerunning the build method to redraw the screen.
-    //experiment with different animations of Curves.*
+    // _heightAnimator.addListener(() =>
+    //     setState(() {})); //rerunning the build method to redraw the screen.
+    // //experiment with different animations of Curves.*
     //Tween class is generic and we have to mention the type of what we are going to animate between two values..
     //Tween itself wont animate values, it just returns them.. We have to call .animate.
   }
@@ -225,12 +225,17 @@ class _AuthCardState extends State<AuthCard>
         borderRadius: BorderRadius.circular(10.0),
       ),
       elevation: 8.0,
-      child: Container(
-        // height: _authMode == AuthMode.Signup ? 320 : 260,
-        height: _heightAnimator.value.height,
-        constraints: BoxConstraints(minHeight: _heightAnimator.value.height),
-        width: deviceSize.width * 0.75,
-        padding: EdgeInsets.all(16.0),
+      //Without manually setting up a listener to the animation, we are using the AnimatedBuilder Widget
+      child: AnimatedBuilder(
+        animation: _heightAnimator,
+        builder: (ctx, ch) => Container(
+            // height: _authMode == AuthMode.Signup ? 320 : 260,
+            height: _heightAnimator.value.height,
+            constraints:
+                BoxConstraints(minHeight: _heightAnimator.value.height),
+            width: deviceSize.width * 0.75,
+            padding: EdgeInsets.all(16.0),
+            child: ch),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
