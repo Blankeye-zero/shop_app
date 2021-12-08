@@ -27,12 +27,14 @@ class AuthScreen extends StatelessWidget {
               gradient: LinearGradient(
                 colors: [
                   //Simplay a colour gradient
-                  Color.fromRGBO(215, 117, 255, 1).withOpacity(0.5),
-                  Color.fromRGBO(255, 188, 117, 1).withOpacity(0.9),
+                  Colors.blueGrey,
+                  Colors.blue,
+                  Colors.blueAccent,
+                  Colors.brown,
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                stops: [0, 1],
+                stops: [0, 1, 1, 0],
               ),
             ),
           ),
@@ -58,22 +60,22 @@ class AuthScreen extends StatelessWidget {
                       // The .. operator calls the translate and then returns what the previous statement returns in this case, the rotationZ
                       //this operator returns what seems to take two lines and a variable and returns the same in a line.
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.deepOrange.shade900,
+                        borderRadius: BorderRadius.circular(40),
+                        color: Theme.of(context).colorScheme.primary,
                         boxShadow: [
                           BoxShadow(
-                            blurRadius: 8,
-                            color: Colors.black26,
+                            blurRadius: 20,
+                            color: Theme.of(context).colorScheme.secondary,
                             offset: Offset(0, 2),
                           )
                         ],
                       ),
                       child: Text(
-                        'MyShop',
+                        'Shopper',
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.secondary,
-                          fontSize: 50,
-                          fontFamily: 'Anton',
+                          color: Colors.white,
+                          fontSize: 30,
+                          fontFamily: 'BungeeInline',
                           fontWeight: FontWeight.normal,
                         ),
                       ),
@@ -129,7 +131,7 @@ class _AuthCardState extends State<AuthCard>
     _animator =
         AnimationController(vsync: this, duration: Duration(milliseconds: 300));
     _heightAnimator = Tween<Size>(
-            begin: Size(double.infinity, 260), end: Size(double.infinity, 320))
+            begin: Size(double.infinity, 260), end: Size(double.infinity, 340))
         .animate(
             CurvedAnimation(parent: _animator, curve: Curves.fastOutSlowIn));
     // _heightAnimator.addListener(() =>

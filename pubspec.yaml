@@ -74,5 +74,8 @@ flutter:
     - family: Anton
       fonts:
         - asset: assets/fonts/Anton-Regular.ttf
+    - family: BungeeInline
+      fonts:
+        - asset: assets/fonts/BungeeInline-Regular.ttf
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

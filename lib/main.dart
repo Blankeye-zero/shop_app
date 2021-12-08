@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             fontFamily: 'Lato',
             colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blueGrey)
-                .copyWith(secondary: Colors.brown),
+                .copyWith(secondary: Colors.black54),
           ),
           //to show the login page instead of authscreen if not logged in already, we use futureBuilder
           home: auth.isAuth
