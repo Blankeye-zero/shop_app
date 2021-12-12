@@ -13,3 +13,7 @@ For the purpose of learning and the implementation of:
 - Token Based Authentication for user sessions
 
 - Working with persistent local storage
+
+##DEMO
+
+![screen-gif](./lib/images/demo.gif)
