@@ -14,6 +14,6 @@ For the purpose of learning and the implementation of:
 
 - Working with persistent local storage
 
-##DEMO
+## DEMO
 
 ![screen-gif](./lib/images/demo.gif)
