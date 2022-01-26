@@ -20,8 +20,10 @@ class ProductDetailPage extends StatelessWidget {
     //we only need build, and no updating thus this is a viable solution.
 
     return Scaffold(
-      appBar: AppBar(title: Text(loadedProduct.title)),
-      body: SingleChildScrollView(
+      // appBar: AppBar(title: Text(loadedProduct.title)),
+      //slivers are scrollable areas on the screen
+      body: CustomScrollView(
+        slivers: <Widget>[],
         child: Column(
           children: [
             //The Hero widget needs tobe present at both the screens, in order to work and both the hero widgets need the same tag id.
