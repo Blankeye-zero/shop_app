@@ -24,11 +24,15 @@ class ProductDetailPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
-                height: 300,
-                width: double.infinity,
-                child:
-                    Image.network(loadedProduct.imageUrl, fit: BoxFit.cover)),
+            //The Hero widget needs tobe present at both the screens, in order to work and both the hero widgets need the same tag id.
+            Hero(
+              tag: loadedProduct.id,
+              child: Container(
+                  height: 300,
+                  width: double.infinity,
+                  child:
+                      Image.network(loadedProduct.imageUrl, fit: BoxFit.cover)),
+            ),
             SizedBox(
               height: 10,
             ),

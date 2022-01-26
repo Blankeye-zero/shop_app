@@ -29,11 +29,15 @@ class ProductItem extends StatelessWidget {
               );
             },
             //FadeInImage takes a placeholder...
-            child: FadeInImage(
-                placeholder:
-                    AssetImage('assets/images/product-placeholder.png'),
-                image: NetworkImage(product.imageUrl),
-                fit: BoxFit.cover)),
+            //Hero Widget takes a tag... Hero is an animated Widget that zooms out an image used for switching routes.
+            child: Hero(
+              tag: product.id,
+              child: FadeInImage(
+                  placeholder:
+                      AssetImage('assets/images/product-placeholder.png'),
+                  image: NetworkImage(product.imageUrl),
+                  fit: BoxFit.cover),
+            )),
         footer: ClipRRect(
           borderRadius: BorderRadius.circular(10),
           child: GridTileBar(
