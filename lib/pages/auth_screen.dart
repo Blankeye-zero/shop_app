@@ -227,17 +227,26 @@ class _AuthCardState extends State<AuthCard>
         borderRadius: BorderRadius.circular(10.0),
       ),
       elevation: 8.0,
-      //Without manually setting up a listener to the animation, we are using the AnimatedBuilder Widget
-      child: AnimatedBuilder(
+      child: AnimatedContainer
+          /*Without manually setting up a listener to the animation, we are using the AnimatedBuilder Widget
+      for custom animation, we use the animated builder but for well known/ predefined animation, we use Animated Containers;
+       AnimatedBuilder(
         animation: _heightAnimator,
-        builder: (ctx, ch) => Container(
-            // height: _authMode == AuthMode.Signup ? 320 : 260,
-            height: _heightAnimator.value.height,
-            constraints:
-                BoxConstraints(minHeight: _heightAnimator.value.height),
-            width: deviceSize.width * 0.75,
-            padding: EdgeInsets.all(16.0),
-            child: ch),
+        builder: (ctx, ch) => Container*/
+          (
+        height: _authMode == AuthMode.Signup ? 320 : 260,
+        duration: Duration(milliseconds: 300),
+        constraints:
+            BoxConstraints(minHeight: _authMode == AuthMode.Signup ? 320 : 260),
+        curve: Curves.easeIn,
+        /*height: _heightAnimator.value.height,
+        constraints: BoxConstraints(minHeight: _heightAnimator.value.height),
+        We donot need our own controller since animated container smoothly transitions between two values on its own.
+        Therefore height animator isnt needed with animated container, maybe with animated builder
+        */
+        width: deviceSize.width * 0.75,
+        padding: EdgeInsets.all(16.0),
+        // child: ch),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
