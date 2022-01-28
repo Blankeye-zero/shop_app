@@ -120,8 +120,9 @@ class _AuthCardState extends State<AuthCard>
   //but flutter already has an animation controller class so dont need to reinvent the wheel.
   //var containerHeight = 260;
   AnimationController _animator; // A class provided by flutter
-  Animation<Size>
-      _heightAnimator; // An animation object - an entity that we are going to animate - in this case the Size.
+  Animation<Offset>
+      _slideAnimator; // An animation object - an entity that we are going to animate - in this case the Size.
+  Animation<double> _opacityAnimation;
 
   @override
   void initState() {
@@ -130,10 +131,11 @@ class _AuthCardState extends State<AuthCard>
     //Animation COntroller gets a vsync param where we give it a pointer to a widget where it only plays the animation once the widget is rendered.
     _animator =
         AnimationController(vsync: this, duration: Duration(milliseconds: 300));
-    _heightAnimator = Tween<Size>(
-            begin: Size(double.infinity, 260), end: Size(double.infinity, 340))
+    _slideAnimator = Tween<Offset>(begin: Offset(0, -1.5), end: Offset(0, 0))
         .animate(
             CurvedAnimation(parent: _animator, curve: Curves.fastOutSlowIn));
+    _opacityAnimation = Tween(begin: 0.0, end: 1.0)
+        .animate(CurvedAnimation(parent: _animator, curve: Curves.easeIn));
     // _heightAnimator.addListener(() =>
     //     setState(() {})); //rerunning the build method to redraw the screen.
     // //experiment with different animations of Curves.*
@@ -227,17 +229,26 @@ class _AuthCardState extends State<AuthCard>
         borderRadius: BorderRadius.circular(10.0),
       ),
       elevation: 8.0,
-      //Without manually setting up a listener to the animation, we are using the AnimatedBuilder Widget
-      child: AnimatedBuilder(
+      child: AnimatedContainer
+          /*Without manually setting up a listener to the animation, we are using the AnimatedBuilder Widget
+      for custom animation, we use the animated builder but for well known/ predefined animation, we use Animated Containers;
+       AnimatedBuilder(
         animation: _heightAnimator,
-        builder: (ctx, ch) => Container(
-            // height: _authMode == AuthMode.Signup ? 320 : 260,
-            height: _heightAnimator.value.height,
-            constraints:
-                BoxConstraints(minHeight: _heightAnimator.value.height),
-            width: deviceSize.width * 0.75,
-            padding: EdgeInsets.all(16.0),
-            child: ch),
+        builder: (ctx, ch) => Container*/
+          (
+        height: _authMode == AuthMode.Signup ? 320 : 260,
+        duration: Duration(milliseconds: 300),
+        constraints:
+            BoxConstraints(minHeight: _authMode == AuthMode.Signup ? 320 : 260),
+        curve: Curves.easeIn,
+        /*height: _heightAnimator.value.height,
+        constraints: BoxConstraints(minHeight: _heightAnimator.value.height),
+        We donot need our own controller since animated container smoothly transitions between two values on its own.
+        Therefore height animator isnt needed with animated container, maybe with animated builder
+        */
+        width: deviceSize.width * 0.75,
+        padding: EdgeInsets.all(16.0),
+        // child: ch),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
@@ -270,20 +281,38 @@ class _AuthCardState extends State<AuthCard>
                     _authData['password'] = value;
                   },
                 ),
-                if (_authMode == AuthMode.Signup)
-                  TextFormField(
-                    enabled: _authMode == AuthMode.Signup,
-                    decoration: InputDecoration(labelText: 'Confirm Password'),
-                    obscureText: true,
-                    validator: _authMode == AuthMode.Signup
-                        ? (value) {
-                            if (value != _passwordController.text) {
-                              return 'Passwords do not match!';
-                            } else
-                              return null;
-                          }
-                        : null,
+                /*if (_authMode == AuthMode.Signup) 
+                We originally used an if statement to adjust the dimensions of the signup box, but we could do this using a built in fade transition widget
+                The FadeTransition widget takes an argument opacity in order to function. The opacity could be made dynamic with the help of an explicitly 
+                defined controller */
+                AnimatedContainer(
+                  constraints: BoxConstraints(
+                      minHeight: _authMode == AuthMode.Signup ? 60 : 0,
+                      maxHeight: _authMode == AuthMode.Signup ? 120 : 0),
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.easeIn,
+                  //The more animations that we nest into each other, The more inefficient the overall performance of the application gets
+                  child: FadeTransition(
+                    opacity: _opacityAnimation,
+                    child: SlideTransition(
+                      position: _slideAnimator,
+                      child: TextFormField(
+                        enabled: _authMode == AuthMode.Signup,
+                        decoration:
+                            InputDecoration(labelText: 'Confirm Password'),
+                        obscureText: true,
+                        validator: _authMode == AuthMode.Signup
+                            ? (value) {
+                                if (value != _passwordController.text) {
+                                  return 'Passwords do not match!';
+                                } else
+                                  return null;
+                              }
+                            : null,
+                      ),
+                    ),
                   ),
+                ),
                 SizedBox(
                   height: 20,
                 ),

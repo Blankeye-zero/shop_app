@@ -20,34 +20,49 @@ class ProductDetailPage extends StatelessWidget {
     //we only need build, and no updating thus this is a viable solution.
 
     return Scaffold(
-      appBar: AppBar(title: Text(loadedProduct.title)),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-                height: 300,
-                width: double.infinity,
-                child:
-                    Image.network(loadedProduct.imageUrl, fit: BoxFit.cover)),
-            SizedBox(
-              height: 10,
+      // appBar: AppBar(title: Text(loadedProduct.title)),
+      //slivers are scrollable areas on the screen
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SliverAppBar(
+            expandedHeight: 300,
+            pinned: true, //appbar will always be visible
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text(loadedProduct.title), //title of the appbar
+              background: Hero(
+                tag: loadedProduct.id,
+                child: Container(
+                    height: 300,
+                    width: double.infinity,
+                    child: Image.network(loadedProduct.imageUrl,
+                        fit: BoxFit.cover)),
+              ), //the part that is expanded.. here we use the hero widget
             ),
-            Text(
-              "\$${loadedProduct.price}",
-              style: TextStyle(color: Colors.grey, fontSize: 20),
-            ),
-            SizedBox(height: 10),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              width: double.infinity,
-              child: Text(
-                loadedProduct.description,
-                textAlign: TextAlign.center,
-                softWrap: true,
+          ),
+          SliverList(
+            delegate: SliverChildListDelegate([
+              SizedBox(
+                height: 10,
               ),
-            )
-          ],
-        ),
+              Text(
+                "\$${loadedProduct.price}",
+                style: TextStyle(color: Colors.grey, fontSize: 20),
+              ),
+              SizedBox(height: 10),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                width: double.infinity,
+                child: Text(
+                  loadedProduct.description,
+                  textAlign: TextAlign.center,
+                  softWrap: true,
+                ),
+              )
+            ]),
+            //the delegate instructs on how to render the elements
+          ), //A listview that is  a part of multiple slivers
+        ],
+        //The Hero widget needs tobe present at both the screens, in order to work and both the hero widgets need the same tag id.
       ),
     );
   }
