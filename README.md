@@ -15,8 +15,8 @@ For the purpose of learning and the implementation of:
 
 - Working with persistent local storage
 
+- Animations 
+
 ## DEMO
 
 ![screen-gif](./lib/images/demo.gif)
-
-(I apologize for the image quality)
