@@ -65,7 +65,7 @@ class MyApp extends StatelessWidget {
                   builder: (context, snapshot) {
                     return snapshot.connectionState == ConnectionState.waiting
                         ? Center(
-                            child: Text('Loading....'),
+                            child: CircularProgressIndicator(),
                           )
                         : AuthScreen();
                   },
