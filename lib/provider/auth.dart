@@ -25,7 +25,7 @@ class Auth with ChangeNotifier {
         _token != null) {
       return _token;
     }
-    print('no token....');
+
     return null;
   }
 
